@@ -98,7 +98,7 @@ func main() {
 	}
 
         go func() {
-            log.Println("Profiler on http://localhost:8080/debug/pprof")
+            fmt.Println("Profiler on http://localhost:8080/debug/pprof")
             gohttp.ListenAndServe("localhost:8080", nil)
         }()
 
