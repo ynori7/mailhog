@@ -6,6 +6,7 @@ import (
 	"os"
 
 	gohttp "net/http"
+        _ "net/http/pprof"
 
 	"github.com/gorilla/pat"
 	"github.com/ian-kent/go-log/log"
@@ -95,6 +96,12 @@ func main() {
 		go http.Listen(apiconf.APIBindAddr, assets.Asset, exitCh, cb1)
 		go http.Listen(uiconf.UIBindAddr, assets.Asset, exitCh, cb2)
 	}
+
+        go func() {
+            log.Println("Profiler on http://localhost:8080/debug/pprof")
+            gohttp.ListenAndServe("localhost:8080", nil)
+        }()
+
 	go smtp.Listen(apiconf, exitCh)
 
 	for {
