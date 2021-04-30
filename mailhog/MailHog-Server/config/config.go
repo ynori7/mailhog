@@ -39,6 +39,7 @@ type Config struct {
 	MongoDb          string
 	MongoColl        string
 	StorageType      string
+	StorageTTL       int
 	CORSOrigin       string
 	MaildirPath      string
 	InviteJim        bool
@@ -73,13 +74,13 @@ func Configure() *Config {
 	switch cfg.StorageType {
 	case "memory":
 		log.Println("Using in-memory storage")
-		cfg.Storage = storage.CreateInMemory()
+		cfg.Storage = storage.CreateInMemory(cfg.StorageTTL)
 	case "mongodb":
 		log.Println("Using MongoDB message storage")
 		s := storage.CreateMongoDB(cfg.MongoURI, cfg.MongoDb, cfg.MongoColl)
 		if s == nil {
 			log.Println("MongoDB storage unavailable, reverting to in-memory storage")
-			cfg.Storage = storage.CreateInMemory()
+			cfg.Storage = storage.CreateInMemory(cfg.StorageTTL)
 		} else {
 			log.Println("Connected to MongoDB")
 			cfg.Storage = s
@@ -124,6 +125,7 @@ func RegisterFlags() {
 	flag.StringVar(&cfg.MongoURI, "mongo-uri", envconf.FromEnvP("MH_MONGO_URI", "127.0.0.1:27017").(string), "MongoDB URI, e.g. 127.0.0.1:27017")
 	flag.StringVar(&cfg.MongoDb, "mongo-db", envconf.FromEnvP("MH_MONGO_DB", "mailhog").(string), "MongoDB database, e.g. mailhog")
 	flag.StringVar(&cfg.MongoColl, "mongo-coll", envconf.FromEnvP("MH_MONGO_COLLECTION", "messages").(string), "MongoDB collection, e.g. messages")
+	flag.IntVar(&cfg.StorageTTL, "storage-ttl", envconf.FromEnvP("MH_STORAGE_TTL", 0).(int), "Message storage TTL in seconds. If zero then unlimited")
 	flag.StringVar(&cfg.CORSOrigin, "cors-origin", envconf.FromEnvP("MH_CORS_ORIGIN", "").(string), "CORS Access-Control-Allow-Origin header for API endpoints")
 	flag.StringVar(&cfg.MaildirPath, "maildir-path", envconf.FromEnvP("MH_MAILDIR_PATH", "").(string), "Maildir path (if storage type is 'maildir')")
 	flag.BoolVar(&cfg.InviteJim, "invite-jim", envconf.FromEnvP("MH_INVITE_JIM", false).(bool), "Decide whether to invite Jim (beware, he causes trouble)")

@@ -4,23 +4,39 @@ import (
 	"errors"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/ynori7/MailHog/mailhog/data"
 )
 
 // InMemory is an in memory storage backend
 type InMemory struct {
+	TTL            int
 	MessageIDIndex map[string]int
 	Messages       []*data.Message
 	mu             sync.Mutex
 }
 
 // CreateInMemory creates a new in memory storage backend
-func CreateInMemory() *InMemory {
-	return &InMemory{
+func CreateInMemory(ttl int) *InMemory {
+	inMemory := &InMemory{
 		MessageIDIndex: make(map[string]int),
 		Messages:       make([]*data.Message, 0),
+		TTL:            ttl,
 	}
+
+	if ttl > 0 {
+		go func() {
+			for {
+				select {
+				case <-time.Tick(time.Second * 30):
+					inMemory.cleanupOldMessages()
+				}
+			}
+		}()
+	}
+
+	return inMemory
 }
 
 // Store stores a message and returns its storage ID
@@ -196,4 +212,21 @@ func (memory *InMemory) Load(id string) (*data.Message, error) {
 		return memory.Messages[idx], nil
 	}
 	return nil, nil
+}
+
+func (memory *InMemory) cleanupOldMessages() {
+	memory.mu.Lock()
+	defer memory.mu.Unlock()
+
+	deleteTime := time.Now().Add(time.Second * -1 * time.Duration(memory.TTL)) //now minus TTL
+
+	validMessages := make([]*data.Message, 0)
+
+	for _, message := range memory.Messages {
+		if !message.Created.Before(deleteTime) {
+			validMessages = append(validMessages, message)
+		}
+	}
+
+	memory.Messages = validMessages
 }
