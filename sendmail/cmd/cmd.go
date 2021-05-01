@@ -63,7 +63,7 @@ func Go() {
 
 	msg, err := mail.ReadMessage(bytes.NewReader(body))
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "error parsing message body")
+		fmt.Fprintln(os.Stderr, fmt.Sprintf("error parsing message body: %s", err))
 		os.Exit(11)
 	}
 

@@ -53,8 +53,9 @@ type Message struct {
 	To      []*Path
 	Content *Content
 	Created time.Time
-	MIME    *MIMEBody // FIXME refactor to use Content.MIME
-	Raw     *SMTPMessage
+	MIME    *MIMEBody    `json:"-"`
+	Raw     *SMTPMessage `json:"-"`
+	Size    int
 }
 
 // Path represents an SMTP forward-path or return-path
@@ -101,6 +102,7 @@ func (m *SMTPMessage) Parse(hostname string) *Message {
 		Content: ContentFromString(m.Data),
 		Created: time.Now(),
 		Raw:     m,
+		Size:    len(m.Data),
 	}
 
 	if msg.Content.IsMIME() {

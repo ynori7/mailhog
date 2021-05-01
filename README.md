@@ -42,8 +42,6 @@ See [MailHog libraries](docs/LIBRARIES.md) for a list of MailHog client librarie
 * Improve documentation within the code and linting
 * Ensure API docs are up-to-date
 * Improve tests
-* Reduce memory footprint
-* Use `embed` for the UI instead of generating byte strings
 
 #### sendmail
 
