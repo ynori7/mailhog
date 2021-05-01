@@ -11,11 +11,10 @@ import (
 
 	"github.com/gorilla/pat"
 	"github.com/ian-kent/go-log/log"
-	"github.com/ynori7/MailHog/mailhog/MailHog-Server/config"
-	"github.com/ynori7/MailHog/mailhog/data"
-	"github.com/ynori7/MailHog/mailhog/storage"
-
 	"github.com/ian-kent/goose"
+	"github.com/ynori7/mailhog/data"
+	"github.com/ynori7/mailhog/server/config"
+	"github.com/ynori7/mailhog/storage"
 )
 
 // APIv1 implements version 1 of the MailHog API

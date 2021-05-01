@@ -2,22 +2,23 @@ package main
 
 import (
 	"flag"
+	gohttp "net/http"
 	"os"
 
-	gohttp "net/http"
-
 	"github.com/ian-kent/go-log/log"
-	"github.com/ynori7/MailHog/mailhog/MailHog-Server/api"
-	"github.com/ynori7/MailHog/mailhog/MailHog-Server/config"
-	"github.com/ynori7/MailHog/mailhog/MailHog-Server/smtp"
-	"github.com/ynori7/MailHog/mailhog/MailHog-UI/assets"
-	comcfg "github.com/ynori7/MailHog/config"
-	"github.com/ynori7/MailHog/mailhog/http"
+	comcfg "github.com/ynori7/mailhog/config"
+	"github.com/ynori7/mailhog/http"
+	"github.com/ynori7/mailhog/server/api"
+	"github.com/ynori7/mailhog/server/config"
+	"github.com/ynori7/mailhog/server/smtp"
+	"github.com/ynori7/mailhog/ui/assets"
 )
 
-var conf *config.Config
-var comconf *comcfg.Config
-var exitCh chan int
+var (
+	conf    *config.Config
+	comconf *comcfg.Config
+	exitCh  chan int
+)
 
 func configure() {
 	comcfg.RegisterFlags()

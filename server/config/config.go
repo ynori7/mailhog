@@ -7,9 +7,9 @@ import (
 	"log"
 
 	"github.com/ian-kent/envconf"
-	"github.com/ynori7/MailHog/mailhog/MailHog-Server/monkey"
-	"github.com/ynori7/MailHog/mailhog/data"
-	"github.com/ynori7/MailHog/mailhog/storage"
+	"github.com/ynori7/mailhog/data"
+	"github.com/ynori7/mailhog/server/monkey"
+	"github.com/ynori7/mailhog/storage"
 )
 
 // DefaultConfig is the default config

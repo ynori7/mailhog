@@ -9,9 +9,9 @@ import (
 	"net/smtp"
 	"os"
 	"os/user"
-)
 
-import flag "github.com/spf13/pflag"
+	flag "github.com/spf13/pflag"
+)
 
 // Go runs the MailHog sendmail replacement.
 func Go() {

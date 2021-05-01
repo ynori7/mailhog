@@ -5,7 +5,7 @@ import (
 	"log"
 	"net"
 
-	"github.com/ynori7/MailHog/mailhog/MailHog-Server/config"
+	"github.com/ynori7/mailhog/server/config"
 )
 
 func Listen(cfg *config.Config, exitCh chan int) *net.TCPListener {

@@ -7,10 +7,10 @@ import (
 
 	"github.com/gorilla/pat"
 	"github.com/ian-kent/go-log/log"
-	"github.com/ynori7/MailHog/mailhog/MailHog-Server/config"
-	"github.com/ynori7/MailHog/mailhog/MailHog-Server/monkey"
-	"github.com/ynori7/MailHog/mailhog/MailHog-Server/websockets"
-	"github.com/ynori7/MailHog/mailhog/data"
+	"github.com/ynori7/mailhog/data"
+	"github.com/ynori7/mailhog/server/config"
+	"github.com/ynori7/mailhog/server/monkey"
+	"github.com/ynori7/mailhog/server/websockets"
 )
 
 // APIv2 implements version 2 of the MailHog API

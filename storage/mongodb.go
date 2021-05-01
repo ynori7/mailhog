@@ -1,10 +1,11 @@
 package storage
 
 import (
-	"github.com/ynori7/MailHog/mailhog/data"
+	"log"
+
+	"github.com/ynori7/mailhog/data"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"log"
 )
 
 // MongoDB represents MongoDB backed storage backend
