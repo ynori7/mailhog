@@ -3,35 +3,41 @@ package main
 import (
 	"flag"
 	"fmt"
+	gohttp "net/http"
 	"os"
 
-	gohttp "net/http"
-        _ "net/http/pprof"
+	_ "net/http/pprof"
 
 	"github.com/gorilla/pat"
+	"github.com/ian-kent/envconf"
 	"github.com/ian-kent/go-log/log"
+	cfgcom "github.com/ynori7/MailHog/config"
 	"github.com/ynori7/MailHog/mailhog/MailHog-Server/api"
 	cfgapi "github.com/ynori7/MailHog/mailhog/MailHog-Server/config"
 	"github.com/ynori7/MailHog/mailhog/MailHog-Server/smtp"
 	"github.com/ynori7/MailHog/mailhog/MailHog-UI/assets"
 	cfgui "github.com/ynori7/MailHog/mailhog/MailHog-UI/config"
 	"github.com/ynori7/MailHog/mailhog/MailHog-UI/web"
-	cfgcom "github.com/ynori7/MailHog/config"
 	"github.com/ynori7/MailHog/mailhog/http"
 	"github.com/ynori7/MailHog/mailhog/mhsendmail/cmd"
 	"golang.org/x/crypto/bcrypt"
 )
 
-var apiconf *cfgapi.Config
-var uiconf *cfgui.Config
-var comconf *cfgcom.Config
-var exitCh chan int
-var version string
+var (
+	apiconf          *cfgapi.Config
+	uiconf           *cfgui.Config
+	comconf          *cfgcom.Config
+	profilingEnabled bool
+
+	exitCh  chan int
+	version string
+)
 
 func configure() {
 	cfgcom.RegisterFlags()
 	cfgapi.RegisterFlags()
 	cfgui.RegisterFlags()
+	flag.BoolVar(&profilingEnabled, "profiling-enabled", envconf.FromEnvP("PROFILING_ENABLED", false).(bool), "When set, profiling via pprof is enabled")
 	flag.Parse()
 	apiconf = cfgapi.Configure()
 	uiconf = cfgui.Configure()
@@ -97,10 +103,12 @@ func main() {
 		go http.Listen(uiconf.UIBindAddr, assets.Asset, exitCh, cb2)
 	}
 
-        go func() {
-            fmt.Println("Profiler on http://localhost:8080/debug/pprof")
-            gohttp.ListenAndServe("localhost:8080", nil)
-        }()
+	if profilingEnabled {
+		go func() {
+			log.Println("Profiler on http://localhost:8080/debug/pprof")
+			gohttp.ListenAndServe("localhost:8080", nil)
+		}()
+	}
 
 	go smtp.Listen(apiconf, exitCh)
 
@@ -112,25 +120,3 @@ func main() {
 		}
 	}
 }
-
-/*
-
-Add some random content to the end of this file, hopefully tricking GitHub
-into recognising this as a Go repo instead of Makefile.
-
-A gopher, ASCII art style - borrowed from
-https://gist.github.com/belbomemo/b5e7dad10fa567a5fe8a
-
-          ,_---~~~~~----._
-   _,,_,*^____      _____``*g*\"*,
-  / __/ /'     ^.  /      \ ^@q   f
- [  @f | @))    |  | @))   l  0 _/
-  \`/   \~____ / __ \_____/    \
-   |           _l__l_           I
-   }          [______]           I
-   ]            | | |            |
-   ]             ~ ~             |
-   |                            |
-    |                           |
-
-*/
