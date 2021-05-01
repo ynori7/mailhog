@@ -36,6 +36,15 @@ See [MailHog libraries](docs/LIBRARIES.md) for a list of MailHog client librarie
 * Lightweight and portable
 * No installation required
 
+### TODO
+
+* Clean up old scripts and READMEs in the packages since they used to be independent repositories
+* Improve documentation within the code and linting
+* Ensure API docs are up-to-date
+* Improve tests
+* Reduce memory footprint
+* Use `embed` for the UI instead of generating byte strings
+
 #### sendmail
 
 [mhsendmail](./sendmail) is a sendmail replacement for MailHog.
