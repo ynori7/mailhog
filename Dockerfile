@@ -9,8 +9,8 @@ RUN apk --no-cache add --virtual build-dependencies \
     git \
   && mkdir -p /root/gocode \
   && export GOPATH=/root/gocode \
-  && go get github.com/ynori7/MailHog \
-  && mv /root/gocode/bin/MailHog /usr/local/bin \
+  && go get github.com/ynori7/mailhog \
+  && mv /root/gocode/bin/mailhog /usr/local/bin \
   && rm -rf /root/gocode \
   && apk del --purge build-dependencies
 
@@ -23,7 +23,7 @@ USER mailhog
 
 WORKDIR /home/mailhog
 
-ENTRYPOINT ["MailHog"]
+ENTRYPOINT ["mailhog"]
 
 # Expose the SMTP and HTTP ports:
 EXPOSE 1025 8025
