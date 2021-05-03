@@ -8,7 +8,6 @@ import (
 	"os"
 
 	"github.com/gorilla/pat"
-	"github.com/ian-kent/envconf"
 	"github.com/ian-kent/go-log/log"
 	cfgcom "github.com/ynori7/mailhog/config"
 	"github.com/ynori7/mailhog/http"
@@ -26,7 +25,6 @@ var (
 	apiconf          *cfgapi.Config
 	uiconf           *cfgui.Config
 	comconf          *cfgcom.Config
-	profilingEnabled bool
 
 	exitCh  chan int
 	version string
@@ -36,7 +34,6 @@ func configure() {
 	cfgcom.RegisterFlags()
 	cfgapi.RegisterFlags()
 	cfgui.RegisterFlags()
-	flag.BoolVar(&profilingEnabled, "profiling-enabled", envconf.FromEnvP("PROFILING_ENABLED", false).(bool), "When set, profiling via pprof is enabled")
 	flag.Parse()
 	apiconf = cfgapi.Configure()
 	uiconf = cfgui.Configure()
@@ -102,7 +99,7 @@ func main() {
 		go http.Listen(uiconf.UIBindAddr, assets.Asset, exitCh, cb2)
 	}
 
-	if profilingEnabled {
+	if comconf.ProfilingEnabled {
 		go func() {
 			log.Println("Profiler on http://localhost:8080/debug/pprof")
 			gohttp.ListenAndServe("localhost:8080", nil)
