@@ -70,7 +70,7 @@ type Content struct {
 	Headers map[string][]string
 	Body    string
 	Size    int
-	MIME    *MIMEBody `json:"-"`
+	MIME    *MIMEBody 
 }
 
 // SMTPMessage represents a raw SMTP message
