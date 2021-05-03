@@ -54,7 +54,7 @@
           {{ getMoment(date(message.Created)).fromNow() }}
         </div>
         <div class="col-md-3 col-sm-12 text-right">
-          {{ fileSize(message.Size) }}
+          {{ fileSize(message.Content.Size) }}
         </div>
       </div>
     </div>
