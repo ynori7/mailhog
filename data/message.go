@@ -53,7 +53,7 @@ type Message struct {
 	To      []*Path
 	Content *Content
 	Created time.Time
-	MIME    *MIMEBody    `json:"-"`
+	MIME    *MIMEBody
 	Raw     *SMTPMessage `json:"-"`
 	Size    int
 }
@@ -71,7 +71,7 @@ type Content struct {
 	Headers map[string][]string
 	Body    string
 	Size    int
-	MIME    *MIMEBody
+	MIME    *MIMEBody `json:"-"`
 }
 
 // SMTPMessage represents a raw SMTP message
