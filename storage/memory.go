@@ -14,7 +14,7 @@ type InMemory struct {
 	TTL            int
 	MessageIDIndex map[string]int
 	Messages       []*data.Message
-	mu             sync.Mutex
+	mu             sync.RWMutex
 }
 
 // CreateInMemory creates a new in memory storage backend
@@ -43,6 +43,7 @@ func CreateInMemory(ttl int) *InMemory {
 func (memory *InMemory) Store(m *data.Message) (string, error) {
 	memory.mu.Lock()
 	defer memory.mu.Unlock()
+
 	memory.Messages = append(memory.Messages, m)
 	memory.MessageIDIndex[string(m.ID)] = len(memory.Messages) - 1
 	return string(m.ID), nil
@@ -50,11 +51,17 @@ func (memory *InMemory) Store(m *data.Message) (string, error) {
 
 // Count returns the number of stored messages
 func (memory *InMemory) Count() int {
+	memory.mu.RLock()
+	defer memory.mu.RUnlock()
+	
 	return len(memory.Messages)
 }
 
 // Search finds messages matching the query
 func (memory *InMemory) Search(kind, query string, start, limit int) (*data.Messages, int, error) {
+	memory.mu.RLock()
+	defer memory.mu.RUnlock()
+
 	// FIXME needs optimising, or replacing with a proper db!
 	query = strings.ToLower(query)
 	var filteredMessages = make([]*data.Message, 0)
@@ -145,6 +152,9 @@ func (memory *InMemory) Search(kind, query string, start, limit int) (*data.Mess
 
 // List lists stored messages by index
 func (memory *InMemory) List(start int, limit int) (*data.Messages, error) {
+	memory.mu.RLock()
+	defer memory.mu.RUnlock()
+
 	var messages = make([]data.Message, 0)
 
 	if len(memory.Messages) == 0 || start > len(memory.Messages) {
@@ -187,6 +197,12 @@ func (memory *InMemory) DeleteOne(id string) error {
 		return errors.New("message not found")
 	}
 
+	memory.delete(index, id)
+	return nil
+}
+
+// delete deletes an individual message from the index and list. NOTE: Only use this after locking the mutex!
+func (memory *InMemory) delete(index int, id string) {
 	delete(memory.MessageIDIndex, id)
 	for k, v := range memory.MessageIDIndex {
 		if v > index {
@@ -194,13 +210,13 @@ func (memory *InMemory) DeleteOne(id string) error {
 		}
 	}
 	memory.Messages = append(memory.Messages[:index], memory.Messages[index+1:]...)
-	return nil
 }
 
 // DeleteAll deletes all in memory messages
 func (memory *InMemory) DeleteAll() error {
 	memory.mu.Lock()
 	defer memory.mu.Unlock()
+
 	memory.Messages = make([]*data.Message, 0)
 	memory.MessageIDIndex = make(map[string]int)
 	return nil
@@ -208,6 +224,9 @@ func (memory *InMemory) DeleteAll() error {
 
 // Load returns an individual message by storage ID
 func (memory *InMemory) Load(id string) (*data.Message, error) {
+	memory.mu.RLock()
+	defer memory.mu.RUnlock()
+
 	if idx, ok := memory.MessageIDIndex[id]; ok {
 		return memory.Messages[idx], nil
 	}
@@ -220,13 +239,9 @@ func (memory *InMemory) cleanupOldMessages() {
 
 	deleteTime := time.Now().Add(time.Second * -1 * time.Duration(memory.TTL)) //now minus TTL
 
-	validMessages := make([]*data.Message, 0)
-
-	for _, message := range memory.Messages {
-		if !message.Created.Before(deleteTime) {
-			validMessages = append(validMessages, message)
+	for id, index := range memory.MessageIDIndex {
+		if memory.Messages[index].Created.Before(deleteTime) {
+			memory.delete(index, id)
 		}
 	}
-
-	memory.Messages = validMessages
 }

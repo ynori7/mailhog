@@ -80,3 +80,38 @@ func TestDeleteOne(t *testing.T) {
 		t.Errorf("storage.Count() expected: %d, got: %d", 24, storage.Count())
 	}
 }
+
+func TestCleanup(t *testing.T) {
+	storage := CreateInMemory(1)
+
+	// given
+	for i := 0; i < 10; i++ {
+		storage.Store(&data.Message{
+			ID:      data.MessageID(fmt.Sprintf("%d", i)),
+			Created: time.Now(),
+		})
+	}
+
+	storage.Store(&data.Message{
+		ID:      data.MessageID("99"),
+		Created: time.Now().Add(-2 * time.Second),
+	})
+
+	// when we clean up an old message and also concurrently access it
+	wg := sync.WaitGroup{}
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		storage.cleanupOldMessages()
+	}()
+	go func() {
+		defer wg.Done()
+		storage.Load("99") // we don't expect anything on this one. It's just to prove there are no race conditions
+	}()
+	wg.Wait()
+
+	// then
+	if storage.Count() != 10 {
+		t.Errorf("storage.Count() expected: %d, got: %d", 10, storage.Count())
+	}
+}
