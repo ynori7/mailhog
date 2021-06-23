@@ -153,11 +153,11 @@ func (c *Session) Read() bool {
 
 // Write writes a reply to the underlying net.TCPConn
 func (c *Session) Write(reply *smtp.Reply) {
-	lines := reply.Lines()
-	for _, l := range lines {
-		logText := strings.Replace(l, "\n", "\\n", -1)
-		logText = strings.Replace(logText, "\r", "\\r", -1)
-		c.logf("Sent %d bytes: '%s'", len(l), logText)
-		c.writer.Write([]byte(l))
+	replyBody := strings.Join(reply.Lines(), "")
+	n, err := c.writer.Write([]byte(replyBody))
+	if err != nil {
+		c.logf("Error writing to socket: ", err)
+	} else {
+		c.logf("Sent %d bytes: '%s'", n, strings.TrimSpace(replyBody))
 	}
 }
