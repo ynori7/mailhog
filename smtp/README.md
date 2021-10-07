@@ -1,7 +1,7 @@
-MailHog SMTP Protocol [![GoDoc](https://godoc.org/github.com/mailhog/smtp?status.svg)](https://godoc.org/github.com/mailhog/smtp) [![Build Status](https://travis-ci.org/mailhog/smtp.svg?branch=master)](https://travis-ci.org/mailhog/smtp)
+MailHog SMTP Protocol [![GoDoc](https://godoc.org/github.com/ynori7/mailhog/smtp?status.svg)](https://godoc.org/github.com/ynori7/mailhog/smtp) 
 =========
 
-`github.com/mailhog/smtp` implements an SMTP server state machine.
+`github.com/ynori7/mailhog/smtp` implements an SMTP server state machine.
 
 It attempts to encapsulate as much of the SMTP protocol (plus its extensions) as possible
 without compromising configurability or requiring specific backend implementations.
@@ -19,7 +19,7 @@ reply = proto.ProcessCommand("EHLO localhost")
 // ...
 ```
 
-See [MailHog-Server](https://github.com/mailhog/MailHog-Server) and [MailHog-MTA](https://github.com/mailhog/MailHog-MTA) for example implementations.
+See [MailHog-Server](/server) and [MailHog-MTA](https://github.com/mailhog/MailHog-MTA) for example implementations.
 
 ### Commands and replies
 
@@ -66,7 +66,7 @@ reply = proto.ProcessData("Test\r\n.\r\n")
 
 The state machine provides hooks to manipulate its behaviour.
 
-See [![GoDoc](https://godoc.org/github.com/mailhog/smtp?status.svg)](https://godoc.org/github.com/mailhog/smtp) for more information.
+See [![GoDoc](https://godoc.org/github.com/ynori7/mailhog/smtp?status.svg)](https://godoc.org/github.com/ynori7/mailhog/smtp) for more information.
 
 | Hook                               | Description
 | ---------------------------------- | -----------
